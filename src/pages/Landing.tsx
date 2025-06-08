@@ -1,11 +1,28 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { HorrorCarousel } from "@/components/HorrorCarousel";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Landing = () => {
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  // Redirect to dashboard if user is already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      navigate("/dashboard");
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white text-xl">Cargando...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -39,13 +56,13 @@ const Landing = () => {
         
         <div className="flex flex-col sm:flex-row gap-4">
           <Button 
-            onClick={() => setShowLogin(true)}
+            onClick={() => navigate("/auth")}
             className="bg-red-600 hover:bg-red-700 text-white text-lg px-8 py-3 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
           >
             Iniciar Sesión
           </Button>
           <Button 
-            onClick={() => setShowRegister(true)}
+            onClick={() => navigate("/auth")}
             variant="outline"
             className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white text-lg px-8 py-3 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
           >
@@ -53,41 +70,6 @@ const Landing = () => {
           </Button>
         </div>
       </div>
-      
-      {/* Modales de Login y Registro - Implementar cuando Supabase esté conectado */}
-      {showLogin && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">Iniciar Sesión</h3>
-            <p className="text-gray-600 mb-4">
-              Conecta Supabase para habilitar la autenticación
-            </p>
-            <Button 
-              onClick={() => setShowLogin(false)}
-              className="w-full"
-            >
-              Cerrar
-            </Button>
-          </div>
-        </div>
-      )}
-      
-      {showRegister && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">Registrarse</h3>
-            <p className="text-gray-600 mb-4">
-              Conecta Supabase para habilitar el registro
-            </p>
-            <Button 
-              onClick={() => setShowRegister(false)}
-              className="w-full"
-            >
-              Cerrar
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

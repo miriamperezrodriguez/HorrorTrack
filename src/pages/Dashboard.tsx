@@ -7,13 +7,31 @@ import { MyMovies } from "@/components/dashboard/MyMovies";
 import { PendingMovies } from "@/components/dashboard/PendingMovies";
 import { WatchHistory } from "@/components/dashboard/WatchHistory";
 import { UserProfile } from "@/components/dashboard/UserProfile";
+import { useNavigate } from "react-router-dom";
+import { signOut } from "@/lib/auth";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("explore");
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleLogout = () => {
-    // Implementar logout cuando Supabase esté conectado
-    console.log("Logout functionality - requires Supabase");
+  const handleLogout = async () => {
+    const { error } = await signOut();
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo cerrar sesión",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión correctamente",
+      });
+      navigate("/");
+    }
   };
 
   return (

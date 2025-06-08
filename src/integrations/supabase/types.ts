@@ -9,7 +9,101 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      movies: {
+        Row: {
+          created_at: string
+          description: string | null
+          genre: Database["public"]["Enums"]["horror_genre"]
+          id: string
+          poster_url: string | null
+          title: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          genre: Database["public"]["Enums"]["horror_genre"]
+          id?: string
+          poster_url?: string | null
+          title: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          genre?: Database["public"]["Enums"]["horror_genre"]
+          id?: string
+          poster_url?: string | null
+          title?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      user_movies: {
+        Row: {
+          created_at: string
+          id: string
+          movie_id: string
+          rating: number | null
+          status: Database["public"]["Enums"]["movie_status"]
+          updated_at: string
+          user_id: string
+          watched_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          movie_id: string
+          rating?: number | null
+          status: Database["public"]["Enums"]["movie_status"]
+          updated_at?: string
+          user_id: string
+          watched_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          movie_id?: string
+          rating?: number | null
+          status?: Database["public"]["Enums"]["movie_status"]
+          updated_at?: string
+          user_id?: string
+          watched_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_movies_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +112,21 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      horror_genre:
+        | "slasher"
+        | "supernatural"
+        | "psychological"
+        | "zombie"
+        | "vampire"
+        | "werewolf"
+        | "demon"
+        | "ghost"
+        | "monster"
+        | "cult"
+        | "found_footage"
+        | "body_horror"
+        | "cosmic_horror"
+      movie_status: "watched" | "pending"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +241,23 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      horror_genre: [
+        "slasher",
+        "supernatural",
+        "psychological",
+        "zombie",
+        "vampire",
+        "werewolf",
+        "demon",
+        "ghost",
+        "monster",
+        "cult",
+        "found_footage",
+        "body_horror",
+        "cosmic_horror",
+      ],
+      movie_status: ["watched", "pending"],
+    },
   },
 } as const
