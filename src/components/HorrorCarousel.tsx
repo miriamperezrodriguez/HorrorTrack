@@ -6,28 +6,28 @@ import { useEffect, useState } from "react";
 const horrorImages = [
   {
     id: 1,
-    url: "https://images.unsplash.com/photo-1520637836862-4d197d17c80a?w=800&h=600&fit=crop",
-    title: "Horror Scene 1"
+    url: "https://i0.wp.com/blog.heroesdepapel.es/wp-content/uploads/2021/09/freddykrueger.png?resize=1024%2C576&ssl=1",
+    title: "Freddy Krueger"
   },
   {
     id: 2,
-    url: "https://images.unsplash.com/photo-1509248961158-d3f231d2c4fb?w=800&h=600&fit=crop",
+    url: "https://cuatrobastardosdotcom.wordpress.com/wp-content/uploads/2016/05/6137990b60940e20.jpg?w=960",
     title: "Horror Scene 2"
   },
   {
     id: 3,
-    url: "https://images.unsplash.com/photo-1516962126636-27ad087061cc?w=800&h=600&fit=crop",
-    title: "Horror Scene 3"
+    url: "https://hips.hearstapps.com/es.h-cdn.co/fotoes/images/cinefilia/hereditary-pelicula-terror-analisis/138110827-1-esl-ES/Por-que-Hereditary-es-lo-mas-terrorifico-que-veras-este-ano.jpg?resize=640:*",
+    title: "Hereditary"
   },
   {
     id: 4,
-    url: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
+    url: "https://media.timeout.com/images/103691714/750/422/image.jpg",
     title: "Horror Scene 4"
   },
   {
     id: 5,
-    url: "https://images.unsplash.com/photo-1520637836862-4d197d17c80a?w=800&h=600&fit=crop",
-    title: "Horror Scene 5"
+    url: "https://hips.hearstapps.com/es.h-cdn.co/fotoes/images/peliculas/posesion-infernal-evil-dead/galeria/6255974-3-esl-ES/Posesion-infernal-Evil-Dead.jpg",
+    title: "Evil Dead"
   }
 ];
 

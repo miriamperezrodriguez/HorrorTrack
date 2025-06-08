@@ -2,47 +2,24 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const watchHistoryData = [
-  {
-    id: 1,
-    title: "Scream",
-    year: 1996,
-    rating: 4,
-    watchedDate: "2024-01-15",
-    poster: "https://images.unsplash.com/photo-1489599735680-0b274d3aece0?w=100&h=150&fit=crop"
-  },
-  {
-    id: 2,
-    title: "Halloween",
-    year: 1978,
-    rating: 5,
-    watchedDate: "2024-01-10",
-    poster: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=100&h=150&fit=crop"
-  },
-  {
-    id: 3,
-    title: "The Conjuring",
-    year: 2013,
-    rating: 3,
-    watchedDate: "2024-01-05",
-    poster: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=150&fit=crop"
-  }
-];
+import { useUserMovies } from "@/hooks/useMovies";
 
 export const WatchHistory = () => {
   const [sortBy, setSortBy] = useState<"date" | "title">("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const { data: userMovies = [], isLoading } = useUserMovies();
 
-  const sortedHistory = [...watchHistoryData].sort((a, b) => {
+  const watchedMovies = userMovies.filter(um => um.status === 'watched' && um.watched_at);
+
+  const sortedHistory = [...watchedMovies].sort((a, b) => {
     if (sortBy === "date") {
-      const dateA = new Date(a.watchedDate).getTime();
-      const dateB = new Date(b.watchedDate).getTime();
+      const dateA = new Date(a.watched_at!).getTime();
+      const dateB = new Date(b.watched_at!).getTime();
       return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
     } else {
       return sortOrder === "desc" 
-        ? b.title.localeCompare(a.title)
-        : a.title.localeCompare(b.title);
+        ? b.movie.title.localeCompare(a.movie.title)
+        : a.movie.title.localeCompare(b.movie.title);
     }
   });
 
@@ -64,6 +41,10 @@ export const WatchHistory = () => {
       day: 'numeric'
     });
   };
+
+  if (isLoading) {
+    return <div className="text-white text-center">Cargando historial...</div>;
+  }
 
   return (
     <div>
@@ -92,25 +73,27 @@ export const WatchHistory = () => {
       </div>
 
       <div className="space-y-4">
-        {sortedHistory.map((movie) => (
-          <div key={movie.id} className="bg-gray-800 rounded-lg p-4 flex items-center gap-4">
+        {sortedHistory.map((userMovie) => (
+          <div key={userMovie.id} className="bg-gray-800 rounded-lg p-4 flex items-center gap-4">
             <img
-              src={movie.poster}
-              alt={movie.title}
+              src={userMovie.movie.poster_url || "https://images.unsplash.com/photo-1489599735680-0b274d3aece0?w=100&h=150&fit=crop"}
+              alt={userMovie.movie.title}
               className="w-16 h-24 object-cover rounded"
             />
             
             <div className="flex-1">
-              <h3 className="text-xl font-bold text-white">{movie.title}</h3>
-              <p className="text-gray-400">{movie.year}</p>
-              <p className="text-gray-500 text-sm">Visto el {formatDate(movie.watchedDate)}</p>
+              <h3 className="text-xl font-bold text-white">{userMovie.movie.title}</h3>
+              <p className="text-gray-400">{userMovie.movie.year}</p>
+              <p className="text-gray-500 text-sm">
+                Visto el {formatDate(userMovie.watched_at!)}
+              </p>
             </div>
             
             <div className="text-right">
               <div className="flex justify-end mb-1">
-                {renderStars(movie.rating)}
+                {renderStars(userMovie.rating || 0)}
               </div>
-              <p className="text-gray-400 text-sm">{movie.rating}/5</p>
+              <p className="text-gray-400 text-sm">{userMovie.rating || 0}/5</p>
             </div>
           </div>
         ))}
