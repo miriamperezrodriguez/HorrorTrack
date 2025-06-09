@@ -18,13 +18,35 @@ export const useUserRole = () => {
     queryFn: async () => {
       if (!user) return null;
       
+      // Verificar si es el superadmin local
+      if (user.email === 'admin@horrortrack.com' && user.id === 'superadmin-id') {
+        console.log("useUserRole: Detectado superadmin local");
+        return {
+          id: 'superadmin-role-id',
+          user_id: user.id,
+          role: 'superadmin' as const,
+          created_at: new Date().toISOString()
+        } as UserRole;
+      }
+      
+      // Para usuarios normales, consultar la base de datos
       const { data, error } = await supabase
         .from('user_roles')
         .select('*')
         .eq('user_id', user.id)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.log("useUserRole: Error o usuario sin rol en BD:", error.message);
+        // Si no tiene rol en la BD, asignar rol de usuario por defecto
+        return {
+          id: 'default-user-role',
+          user_id: user.id,
+          role: 'user' as const,
+          created_at: new Date().toISOString()
+        } as UserRole;
+      }
+      
       return data as UserRole;
     },
     enabled: !!user
