@@ -28,15 +28,40 @@ export const signUp = async (email: string, password: string, username?: string)
 };
 
 export const signIn = async (email: string, password: string) => {
+  console.log("Auth: Intentando login con", email);
+  
   // Verificar si son credenciales de superadmin
   if (email === SUPERADMIN_EMAIL && password === SUPERADMIN_PASSWORD) {
-    // Intentar iniciar sesión con superadmin
+    console.log("Auth: Credenciales de superadmin detectadas");
+    
+    // Intentar iniciar sesión directamente
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
     
+    if (data?.user) {
+      console.log("Auth: Login de superadmin exitoso");
+      
+      // Asegurar que tiene rol de superadmin
+      try {
+        await supabase
+          .from('user_roles')
+          .upsert({
+            user_id: data.user.id,
+            role: 'superadmin'
+          });
+        console.log("Auth: Rol de superadmin asignado/actualizado");
+      } catch (roleError) {
+        console.log("Auth: Error asignando rol de superadmin:", roleError);
+      }
+      
+      return { data, error: null };
+    }
+    
     if (error) {
+      console.log("Auth: Error en login de superadmin, intentando crear cuenta");
+      
       // Si el superadmin no existe, crearlo
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: SUPERADMIN_EMAIL,
@@ -49,41 +74,37 @@ export const signIn = async (email: string, password: string) => {
       });
       
       if (signUpError) {
+        console.log("Auth: Error creando superadmin:", signUpError);
         return { data: null, error: signUpError };
       }
       
       // Asignar rol de superadmin
       if (signUpData.user) {
-        await supabase
-          .from('user_roles')
-          .upsert({
-            user_id: signUpData.user.id,
-            role: 'superadmin'
-          });
+        try {
+          await supabase
+            .from('user_roles')
+            .upsert({
+              user_id: signUpData.user.id,
+              role: 'superadmin'
+            });
+          console.log("Auth: Superadmin creado con rol asignado");
+        } catch (roleError) {
+          console.log("Auth: Error asignando rol al nuevo superadmin:", roleError);
+        }
       }
       
       return { data: signUpData, error: null };
     }
-    
-    // Asegurar que tiene rol de superadmin
-    if (data.user) {
-      await supabase
-        .from('user_roles')
-        .upsert({
-          user_id: data.user.id,
-          role: 'superadmin'
-        });
-    }
-    
-    return { data, error };
   }
   
   // Inicio de sesión normal
+  console.log("Auth: Login normal");
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password
   });
   
+  console.log("Auth: Resultado login normal:", { user: !!data?.user, error: !!error });
   return { data, error };
 };
 

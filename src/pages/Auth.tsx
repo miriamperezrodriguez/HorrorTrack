@@ -32,22 +32,30 @@ const Auth = () => {
 
     try {
       if (isLogin) {
+        console.log("Intentando iniciar sesión con:", email);
         const { data, error } = await signIn(email, password);
         
         if (error) {
+          console.log("Error en login:", error);
           toast({
             title: "Error al iniciar sesión",
             description: error.message,
             variant: "destructive",
           });
         } else if (data?.user) {
+          console.log("Login exitoso:", data.user);
           toast({
             title: "¡Bienvenido!",
             description: "Has iniciado sesión correctamente",
           });
           
-          console.log("Usuario logueado:", data.user);
-          // No redirigimos aquí, el useEffect se encargará cuando el estado se actualice
+          // Forzar redirección inmediata para superadmin
+          if (email === "miriamisonfireart@gmail.com") {
+            console.log("Superadmin detectado, redirigiendo inmediatamente");
+            setTimeout(() => {
+              navigate("/dashboard", { replace: true });
+            }, 100);
+          }
         }
       } else {
         const { error } = await signUp(email, password, username);
