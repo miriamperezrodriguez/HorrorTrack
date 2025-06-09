@@ -49,12 +49,10 @@ const Auth = () => {
             description: "Has iniciado sesión correctamente",
           });
           
-          // Forzar redirección inmediata para superadmin
-          if (email === "miriamisonfireart@gmail.com") {
+          // Para el superadmin, redirigir inmediatamente
+          if (email === "admin@horrortrack.com") {
             console.log("Superadmin detectado, redirigiendo inmediatamente");
-            setTimeout(() => {
-              navigate("/dashboard", { replace: true });
-            }, 100);
+            navigate("/dashboard", { replace: true });
           }
         }
       } else {
@@ -97,6 +95,15 @@ const Auth = () => {
             <p className="text-gray-400">
               {isLogin ? "Inicia sesión en tu cuenta" : "Crea tu cuenta"}
             </p>
+            
+            {/* Mostrar credenciales de admin solo en desarrollo */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mt-4 p-3 bg-gray-700 rounded text-xs text-gray-300">
+                <p className="font-semibold mb-1">Credenciales de Admin:</p>
+                <p>Email: admin@horrortrack.com</p>
+                <p>Password: admin123</p>
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">

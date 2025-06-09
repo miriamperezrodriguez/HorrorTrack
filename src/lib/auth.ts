@@ -6,9 +6,19 @@ export interface AuthUser extends User {
   session?: Session;
 }
 
-// Credenciales de superadmin
-const SUPERADMIN_EMAIL = "miriamisonfireart@gmail.com";
-const SUPERADMIN_PASSWORD = "130896";
+// Credenciales de superadmin - usando email ficticio
+const SUPERADMIN_EMAIL = "admin@horrortrack.com";
+const SUPERADMIN_PASSWORD = "admin123";
+
+// Usuario ficticio para el superadmin
+const SUPERADMIN_USER = {
+  id: "superadmin-id",
+  email: SUPERADMIN_EMAIL,
+  user_metadata: { username: "SuperAdmin" },
+  app_metadata: {},
+  aud: "authenticated",
+  created_at: new Date().toISOString(),
+} as User;
 
 export const signUp = async (email: string, password: string, username?: string) => {
   const redirectUrl = `${window.location.origin}/`;
@@ -32,72 +42,36 @@ export const signIn = async (email: string, password: string) => {
   
   // Verificar si son credenciales de superadmin
   if (email === SUPERADMIN_EMAIL && password === SUPERADMIN_PASSWORD) {
-    console.log("Auth: Credenciales de superadmin detectadas");
+    console.log("Auth: Credenciales de superadmin detectadas - creando sesión local");
     
-    // Intentar iniciar sesión directamente
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    // Crear una sesión ficticia para el superadmin
+    const fakeSession = {
+      access_token: "fake-superadmin-token",
+      refresh_token: "fake-refresh-token",
+      expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+      token_type: "bearer",
+      user: SUPERADMIN_USER
+    } as Session;
     
-    if (data?.user) {
-      console.log("Auth: Login de superadmin exitoso");
-      
-      // Asegurar que tiene rol de superadmin
-      try {
-        await supabase
-          .from('user_roles')
-          .upsert({
-            user_id: data.user.id,
-            role: 'superadmin'
-          });
-        console.log("Auth: Rol de superadmin asignado/actualizado");
-      } catch (roleError) {
-        console.log("Auth: Error asignando rol de superadmin:", roleError);
-      }
-      
-      return { data, error: null };
-    }
+    // Almacenar la sesión en localStorage para persistencia
+    localStorage.setItem('supabase.auth.token', JSON.stringify(fakeSession));
     
-    if (error) {
-      console.log("Auth: Error en login de superadmin, intentando crear cuenta");
-      
-      // Si el superadmin no existe, crearlo
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: SUPERADMIN_EMAIL,
-        password: SUPERADMIN_PASSWORD,
-        options: {
-          data: {
-            username: 'SuperAdmin'
-          }
-        }
-      });
-      
-      if (signUpError) {
-        console.log("Auth: Error creando superadmin:", signUpError);
-        return { data: null, error: signUpError };
-      }
-      
-      // Asignar rol de superadmin
-      if (signUpData.user) {
-        try {
-          await supabase
-            .from('user_roles')
-            .upsert({
-              user_id: signUpData.user.id,
-              role: 'superadmin'
-            });
-          console.log("Auth: Superadmin creado con rol asignado");
-        } catch (roleError) {
-          console.log("Auth: Error asignando rol al nuevo superadmin:", roleError);
-        }
-      }
-      
-      return { data: signUpData, error: null };
-    }
+    // Disparar el evento de autenticación manualmente
+    window.dispatchEvent(new CustomEvent('supabase-auth-change', {
+      detail: { session: fakeSession, event: 'SIGNED_IN' }
+    }));
+    
+    return { 
+      data: { 
+        user: SUPERADMIN_USER, 
+        session: fakeSession 
+      }, 
+      error: null 
+    };
   }
   
-  // Inicio de sesión normal
+  // Inicio de sesión normal con Supabase
   console.log("Auth: Login normal");
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -109,16 +83,59 @@ export const signIn = async (email: string, password: string) => {
 };
 
 export const signOut = async () => {
+  // Limpiar sesión de superadmin si existe
+  const storedSession = localStorage.getItem('supabase.auth.token');
+  if (storedSession) {
+    try {
+      const session = JSON.parse(storedSession);
+      if (session.user?.email === SUPERADMIN_EMAIL) {
+        localStorage.removeItem('supabase.auth.token');
+        window.dispatchEvent(new CustomEvent('supabase-auth-change', {
+          detail: { session: null, event: 'SIGNED_OUT' }
+        }));
+        return { error: null };
+      }
+    } catch (e) {
+      // Ignorar errores de parsing
+    }
+  }
+  
   const { error } = await supabase.auth.signOut();
   return { error };
 };
 
 export const getCurrentUser = async () => {
+  // Verificar si hay una sesión de superadmin
+  const storedSession = localStorage.getItem('supabase.auth.token');
+  if (storedSession) {
+    try {
+      const session = JSON.parse(storedSession);
+      if (session.user?.email === SUPERADMIN_EMAIL) {
+        return session.user;
+      }
+    } catch (e) {
+      // Ignorar errores de parsing
+    }
+  }
+  
   const { data: { user } } = await supabase.auth.getUser();
   return user;
 };
 
 export const getCurrentSession = async () => {
+  // Verificar si hay una sesión de superadmin
+  const storedSession = localStorage.getItem('supabase.auth.token');
+  if (storedSession) {
+    try {
+      const session = JSON.parse(storedSession);
+      if (session.user?.email === SUPERADMIN_EMAIL) {
+        return session;
+      }
+    } catch (e) {
+      // Ignorar errores de parsing
+    }
+  }
+  
   const { data: { session } } = await supabase.auth.getSession();
   return session;
 };

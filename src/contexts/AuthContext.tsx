@@ -31,27 +31,70 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     console.log("AuthProvider: Configurando listener de autenticación");
 
-    // Set up auth state listener
+    // Listener para eventos customizados del superadmin
+    const handleCustomAuthChange = (event: any) => {
+      console.log("AuthProvider: Evento custom de auth", event.detail);
+      const { session: newSession, event: authEvent } = event.detail;
+      
+      if (authEvent === 'SIGNED_IN') {
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+      } else if (authEvent === 'SIGNED_OUT') {
+        setSession(null);
+        setUser(null);
+      }
+      setLoading(false);
+    };
+
+    window.addEventListener('supabase-auth-change', handleCustomAuthChange);
+
+    // Set up auth state listener para usuarios normales
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log("AuthProvider: Cambio de estado de auth", { event, session: !!session });
-        setSession(session);
-        setUser(session?.user ?? null);
+        console.log("AuthProvider: Cambio de estado de auth Supabase", { event, session: !!session });
+        // Solo actualizar si no es una sesión de superadmin
+        const storedSession = localStorage.getItem('supabase.auth.token');
+        if (!storedSession || !storedSession.includes('admin@horrortrack.com')) {
+          setSession(session);
+          setUser(session?.user ?? null);
+        }
         setLoading(false);
       }
     );
 
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("AuthProvider: Sesión inicial", { session: !!session });
+    // Verificar sesión inicial
+    const checkInitialSession = async () => {
+      // Primero verificar si hay una sesión de superadmin almacenada
+      const storedSession = localStorage.getItem('supabase.auth.token');
+      if (storedSession) {
+        try {
+          const session = JSON.parse(storedSession);
+          if (session.user?.email === 'admin@horrortrack.com') {
+            console.log("AuthProvider: Sesión de superadmin encontrada");
+            setSession(session);
+            setUser(session.user);
+            setLoading(false);
+            return;
+          }
+        } catch (e) {
+          // Ignorar errores de parsing
+        }
+      }
+
+      // Si no hay sesión de superadmin, verificar sesión normal de Supabase
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log("AuthProvider: Sesión inicial de Supabase", { session: !!session });
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-    });
+    };
+
+    checkInitialSession();
 
     return () => {
-      console.log("AuthProvider: Limpiando suscripción");
+      console.log("AuthProvider: Limpiando suscripciones");
       subscription.unsubscribe();
+      window.removeEventListener('supabase-auth-change', handleCustomAuthChange);
     };
   }, []);
 
