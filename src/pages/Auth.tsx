@@ -35,7 +35,10 @@ const Auth = () => {
             title: "¡Bienvenido!",
             description: "Has iniciado sesión correctamente",
           });
-          navigate("/dashboard");
+          // Forzar navegación al dashboard
+          setTimeout(() => {
+            navigate("/dashboard", { replace: true });
+          }, 100);
         }
       } else {
         const { error } = await signUp(email, password, username);
