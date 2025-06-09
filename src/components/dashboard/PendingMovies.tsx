@@ -1,10 +1,12 @@
 
 import { Button } from "@/components/ui/button";
-import { useUserMovies, useUpdateUserMovie } from "@/hooks/useMovies";
+import { useUserMovies, useUpdateUserMovie, useDeleteUserMovie } from "@/hooks/useMovies";
+import { Trash2 } from "lucide-react";
 
 export const PendingMovies = () => {
   const { data: userMovies = [], isLoading } = useUserMovies();
   const updateUserMovie = useUpdateUserMovie();
+  const deleteUserMovie = useDeleteUserMovie();
 
   const pendingMovies = userMovies.filter(um => um.status === 'pending');
 
@@ -13,6 +15,10 @@ export const PendingMovies = () => {
       id: userMovieId,
       updates: { status: 'watched' }
     });
+  };
+
+  const removeMovie = (userMovieId: string) => {
+    deleteUserMovie.mutate(userMovieId);
   };
 
   if (isLoading) {
@@ -37,6 +43,15 @@ export const PendingMovies = () => {
                 <h3 className="text-xl font-bold text-white mb-1">{userMovie.movie.title}</h3>
                 <p className="text-gray-300">{userMovie.movie.year}</p>
               </div>
+              <Button
+                onClick={() => removeMovie(userMovie.id)}
+                variant="destructive"
+                size="sm"
+                className="absolute top-2 right-2 p-2"
+                disabled={deleteUserMovie.isPending}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
             
             <div className="p-4">

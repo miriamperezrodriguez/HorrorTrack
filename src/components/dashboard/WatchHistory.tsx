@@ -2,12 +2,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useUserMovies } from "@/hooks/useMovies";
+import { useUserMovies, useDeleteUserMovie } from "@/hooks/useMovies";
+import { Trash2 } from "lucide-react";
 
 export const WatchHistory = () => {
   const [sortBy, setSortBy] = useState<"date" | "title">("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const { data: userMovies = [], isLoading } = useUserMovies();
+  const deleteUserMovie = useDeleteUserMovie();
 
   const watchedMovies = userMovies.filter(um => um.status === 'watched' && um.watched_at);
 
@@ -40,6 +42,10 @@ export const WatchHistory = () => {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const removeMovie = (userMovieId: string) => {
+    deleteUserMovie.mutate(userMovieId);
   };
 
   if (isLoading) {
@@ -95,6 +101,16 @@ export const WatchHistory = () => {
               </div>
               <p className="text-gray-400 text-sm">{userMovie.rating || 0}/5</p>
             </div>
+
+            <Button
+              onClick={() => removeMovie(userMovie.id)}
+              variant="destructive"
+              size="sm"
+              className="p-2"
+              disabled={deleteUserMovie.isPending}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </div>
         ))}
       </div>

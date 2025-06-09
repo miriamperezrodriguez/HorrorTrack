@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useMovies, useUserMovies, useAddUserMovie } from "@/hooks/useMovies";
+import { useMovies, useUserMovies, useAddUserMovie, useDeleteUserMovie } from "@/hooks/useMovies";
+import { Trash2 } from "lucide-react";
 
 const horrorGenres = [
   { id: "slasher", name: "Slasher" },
@@ -18,14 +19,18 @@ export const ExploreMovies = () => {
   const { data: movies = [], isLoading } = useMovies();
   const { data: userMovies = [] } = useUserMovies();
   const addUserMovie = useAddUserMovie();
+  const deleteUserMovie = useDeleteUserMovie();
 
   const markMovie = (movieId: string, status: 'watched' | 'pending') => {
     addUserMovie.mutate({ movieId, status });
   };
 
-  const getUserMovieStatus = (movieId: string) => {
-    const userMovie = userMovies.find(um => um.movie_id === movieId);
-    return userMovie?.status;
+  const removeMovie = (userMovieId: string) => {
+    deleteUserMovie.mutate(userMovieId);
+  };
+
+  const getUserMovie = (movieId: string) => {
+    return userMovies.find(um => um.movie_id === movieId);
   };
 
   const filteredMovies = movies.filter(movie => movie.genre === activeGenre);
@@ -55,7 +60,7 @@ export const ExploreMovies = () => {
           <TabsContent key={genre.id} value={genre.id}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredMovies.map((movie) => {
-                const status = getUserMovieStatus(movie.id);
+                const userMovie = getUserMovie(movie.id);
                 return (
                   <div key={movie.id} className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
                     <div className="relative">
@@ -69,17 +74,28 @@ export const ExploreMovies = () => {
                         <h3 className="text-xl font-bold text-white mb-1">{movie.title}</h3>
                         <p className="text-gray-300">{movie.year}</p>
                       </div>
+                      {userMovie && (
+                        <Button
+                          onClick={() => removeMovie(userMovie.id)}
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-2 right-2 p-2"
+                          disabled={deleteUserMovie.isPending}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                     
                     <div className="p-4">
-                      {status ? (
+                      {userMovie ? (
                         <div className="text-center">
                           <span className={`inline-block px-3 py-1 rounded-full text-sm ${
-                            status === 'watched' 
+                            userMovie.status === 'watched' 
                               ? 'bg-green-600 text-white' 
                               : 'bg-yellow-600 text-white'
                           }`}>
-                            {status === 'watched' ? 'Vista' : 'Pendiente'}
+                            {userMovie.status === 'watched' ? 'Vista' : 'Pendiente'}
                           </span>
                         </div>
                       ) : (
