@@ -9,10 +9,11 @@ export interface AuthUser extends User {
 // Credenciales de superadmin - usando email ficticio
 const SUPERADMIN_EMAIL = "admin@horrortrack.com";
 const SUPERADMIN_PASSWORD = "admin123";
+const SUPERADMIN_UUID = "00000000-0000-0000-0000-000000000001";
 
 // Usuario ficticio para el superadmin
 const SUPERADMIN_USER = {
-  id: "superadmin-id",
+  id: SUPERADMIN_UUID,
   email: SUPERADMIN_EMAIL,
   user_metadata: { username: "SuperAdmin" },
   app_metadata: {},

@@ -22,11 +22,14 @@ export const useUserRole = () => {
       if (user.email === 'admin@horrortrack.com') {
         console.log("useUserRole: Detectado superadmin local");
         
-        // Crear o actualizar el rol de superadmin en la base de datos
+        // Generar un UUID válido para el superadmin si es necesario
+        const superadminUUID = '00000000-0000-0000-0000-000000000001';
+        
+        // Verificar si el rol de superadmin ya existe
         const { data: existingRole, error: fetchError } = await supabase
           .from('user_roles')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', superadminUUID)
           .single();
         
         if (fetchError && fetchError.code !== 'PGRST116') {
@@ -35,23 +38,29 @@ export const useUserRole = () => {
         
         if (!existingRole) {
           // Crear el rol de superadmin si no existe
-          const { error: insertError } = await supabase
+          console.log("useUserRole: Creando rol de superadmin");
+          const { data: newRole, error: insertError } = await supabase
             .from('user_roles')
             .insert({
-              user_id: user.id,
+              user_id: superadminUUID,
               role: 'superadmin'
-            });
+            })
+            .select()
+            .single();
           
           if (insertError) {
             console.log("useUserRole: Error creando rol superadmin:", insertError);
+          } else {
+            console.log("useUserRole: Rol de superadmin creado exitosamente");
+            return newRole as UserRole;
           }
         }
         
-        return {
-          id: existingRole?.id || 'superadmin-role-id',
-          user_id: user.id,
+        return existingRole || {
+          id: 'superadmin-role-id',
+          user_id: superadminUUID,
           role: 'superadmin' as const,
-          created_at: existingRole?.created_at || new Date().toISOString()
+          created_at: new Date().toISOString()
         } as UserRole;
       }
       
