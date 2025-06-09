@@ -36,8 +36,11 @@ const Auth = () => {
             description: "Has iniciado sesión correctamente",
           });
           
-          // Redirección inmediata al dashboard
-          window.location.href = "/dashboard";
+          console.log("Usuario logueado:", data.user);
+          console.log("Redirigiendo al dashboard...");
+          
+          // Usar navigate en lugar de window.location.href
+          navigate("/dashboard", { replace: true });
         }
       } else {
         const { error } = await signUp(email, password, username);
@@ -57,6 +60,7 @@ const Auth = () => {
         }
       }
     } catch (error) {
+      console.error("Error en autenticación:", error);
       toast({
         title: "Error",
         description: "Algo salió mal. Inténtalo de nuevo.",

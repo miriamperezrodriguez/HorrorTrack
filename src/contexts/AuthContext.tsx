@@ -29,9 +29,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("AuthProvider: Configurando listener de autenticación");
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log("AuthProvider: Cambio de estado de auth", { event, session: !!session });
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -40,13 +43,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("AuthProvider: Sesión inicial", { session: !!session });
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log("AuthProvider: Limpiando suscripción");
+      subscription.unsubscribe();
+    };
   }, []);
+
+  console.log("AuthProvider: Estado actual", { user: !!user, loading });
 
   return (
     <AuthContext.Provider value={{ user, session, loading }}>
