@@ -6,16 +6,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface UserWithProfile {
+interface UserWithRole {
   id: string;
-  email: string;
+  username: string | null;
   created_at: string;
-  profiles: {
-    username: string;
-  } | null;
-  user_roles: {
-    role: string;
-  } | null;
+  role: string;
 }
 
 export const UserManagement = () => {
@@ -26,17 +21,32 @@ export const UserManagement = () => {
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Primero obtenemos los perfiles
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          id,
-          username,
-          created_at,
-          user_roles (role)
-        `);
+        .select('id, username, created_at');
       
-      if (error) throw error;
-      return data;
+      if (profilesError) throw profilesError;
+
+      // Luego obtenemos los roles
+      const { data: roles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+      
+      if (rolesError) throw rolesError;
+
+      // Combinamos los datos
+      const usersWithRoles: UserWithRole[] = profiles.map(profile => {
+        const userRole = roles.find(role => role.user_id === profile.id);
+        return {
+          id: profile.id,
+          username: profile.username,
+          created_at: profile.created_at,
+          role: userRole?.role || 'user'
+        };
+      });
+
+      return usersWithRoles;
     }
   });
 
@@ -105,18 +115,18 @@ export const UserManagement = () => {
                   <td className="px-6 py-4 font-mono text-sm">{user.id.slice(0, 8)}...</td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded text-xs ${
-                      user.user_roles?.role === 'superadmin' 
+                      user.role === 'superadmin' 
                         ? 'bg-red-600 text-white' 
                         : 'bg-blue-600 text-white'
                     }`}>
-                      {user.user_roles?.role || 'user'}
+                      {user.role}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     {new Date(user.created_at).toLocaleDateString('es-ES')}
                   </td>
                   <td className="px-6 py-4">
-                    {user.user_roles?.role !== 'superadmin' && (
+                    {user.role !== 'superadmin' && (
                       <Button
                         onClick={() => deleteUser.mutate(user.id)}
                         variant="destructive"

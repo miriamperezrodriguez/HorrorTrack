@@ -8,8 +8,11 @@ import { useMovies } from "@/hooks/useMovies";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { Database } from '@/integrations/supabase/types';
 
-const horrorGenres = [
+type HorrorGenre = Database['public']['Enums']['horror_genre'];
+
+const horrorGenres: { id: HorrorGenre; name: string }[] = [
   { id: "slasher", name: "Slasher" },
   { id: "supernatural", name: "Sobrenatural" },
   { id: "psychological", name: "Psicológico" },
@@ -20,7 +23,13 @@ const horrorGenres = [
 
 export const MovieManagement = () => {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newMovie, setNewMovie] = useState({
+  const [newMovie, setNewMovie] = useState<{
+    title: string;
+    year: number;
+    genre: HorrorGenre | '';
+    description: string;
+    poster_url: string;
+  }>({
     title: '',
     year: new Date().getFullYear(),
     genre: '',
@@ -36,7 +45,13 @@ export const MovieManagement = () => {
     mutationFn: async (movieData: typeof newMovie) => {
       const { data, error } = await supabase
         .from('movies')
-        .insert([movieData])
+        .insert([{
+          title: movieData.title,
+          year: movieData.year,
+          genre: movieData.genre as HorrorGenre,
+          description: movieData.description,
+          poster_url: movieData.poster_url
+        }])
         .select();
 
       if (error) throw error;
@@ -154,7 +169,7 @@ export const MovieManagement = () => {
               <label className="block text-white text-sm font-medium mb-2">
                 Género *
               </label>
-              <Select value={newMovie.genre} onValueChange={(value) => setNewMovie({...newMovie, genre: value})}>
+              <Select value={newMovie.genre} onValueChange={(value) => setNewMovie({...newMovie, genre: value as HorrorGenre})}>
                 <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
                   <SelectValue placeholder="Seleccionar género" />
                 </SelectTrigger>
