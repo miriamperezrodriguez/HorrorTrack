@@ -21,11 +21,10 @@ export const UserManagement = () => {
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      // Obtener perfiles de usuarios reales (excluir superadmin local)
+      // Obtener perfiles de usuarios reales
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, username, created_at')
-        .neq('id', 'superadmin-id'); // Excluir el superadmin local
+        .select('id, username, created_at');
       
       if (profilesError) {
         console.error('Error obteniendo perfiles:', profilesError);
@@ -36,7 +35,7 @@ export const UserManagement = () => {
         return [];
       }
 
-      // Obtener roles solo para usuarios reales
+      // Obtener roles para todos los usuarios
       const userIds = profiles.map(p => p.id);
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')

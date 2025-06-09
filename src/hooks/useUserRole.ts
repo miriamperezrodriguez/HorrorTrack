@@ -22,43 +22,10 @@ export const useUserRole = () => {
       if (user.email === 'admin@horrortrack.com') {
         console.log("useUserRole: Detectado superadmin local");
         
-        // Generar un UUID válido para el superadmin si es necesario
-        const superadminUUID = '00000000-0000-0000-0000-000000000001';
-        
-        // Verificar si el rol de superadmin ya existe
-        const { data: existingRole, error: fetchError } = await supabase
-          .from('user_roles')
-          .select('*')
-          .eq('user_id', superadminUUID)
-          .single();
-        
-        if (fetchError && fetchError.code !== 'PGRST116') {
-          console.log("useUserRole: Error consultando rol:", fetchError);
-        }
-        
-        if (!existingRole) {
-          // Crear el rol de superadmin si no existe
-          console.log("useUserRole: Creando rol de superadmin");
-          const { data: newRole, error: insertError } = await supabase
-            .from('user_roles')
-            .insert({
-              user_id: superadminUUID,
-              role: 'superadmin'
-            })
-            .select()
-            .single();
-          
-          if (insertError) {
-            console.log("useUserRole: Error creando rol superadmin:", insertError);
-          } else {
-            console.log("useUserRole: Rol de superadmin creado exitosamente");
-            return newRole as UserRole;
-          }
-        }
-        
-        return existingRole || {
-          id: 'superadmin-role-id',
-          user_id: superadminUUID,
+        // Para el superadmin local, crear un rol ficticio que siempre devuelva superadmin
+        return {
+          id: 'superadmin-role-local',
+          user_id: '00000000-0000-0000-0000-000000000001',
           role: 'superadmin' as const,
           created_at: new Date().toISOString()
         } as UserRole;
