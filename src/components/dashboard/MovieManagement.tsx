@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,54 +44,23 @@ export const MovieManagement = () => {
   const { user } = useAuth();
 
   const addMovie = useMutation({
-    mutationFn: async (movieData: typeof newMovie) => {
+    mutationFn: async (movieData: { title: string; year: number; genre: HorrorGenre; description: string; poster_url: string }) => {
       console.log("Agregando película:", movieData);
       console.log("Usuario actual:", user);
       
-      // Para el superadmin local, usar RPC o insertar directamente sin RLS
-      if (user?.email === 'admin@horrortrack.com') {
-        const { data, error } = await supabase.rpc('insert_movie_as_admin', {
-          movie_title: movieData.title,
-          movie_year: movieData.year,
-          movie_genre: movieData.genre as HorrorGenre,
-          movie_description: movieData.description,
-          movie_poster_url: movieData.poster_url
-        });
+      const { data, error } = await supabase
+        .from('movies')
+        .insert([{
+          title: movieData.title,
+          year: movieData.year,
+          genre: movieData.genre,
+          description: movieData.description,
+          poster_url: movieData.poster_url
+        }])
+        .select();
 
-        if (error) {
-          console.log("Error con RPC, intentando inserción directa:", error);
-          // Fallback: inserción directa
-          const { data: directData, error: directError } = await supabase
-            .from('movies')
-            .insert([{
-              title: movieData.title,
-              year: movieData.year,
-              genre: movieData.genre as HorrorGenre,
-              description: movieData.description,
-              poster_url: movieData.poster_url
-            }])
-            .select();
-
-          if (directError) throw directError;
-          return directData;
-        }
-        return data;
-      } else {
-        // Para usuarios normales
-        const { data, error } = await supabase
-          .from('movies')
-          .insert([{
-            title: movieData.title,
-            year: movieData.year,
-            genre: movieData.genre as HorrorGenre,
-            description: movieData.description,
-            poster_url: movieData.poster_url
-          }])
-          .select();
-
-        if (error) throw error;
-        return data;
-      }
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['movies'] });
@@ -152,7 +122,15 @@ export const MovieManagement = () => {
       });
       return;
     }
-    addMovie.mutate(newMovie);
+    
+    // Ensure genre is a valid HorrorGenre before calling mutation
+    addMovie.mutate({
+      title: newMovie.title,
+      year: newMovie.year,
+      genre: newMovie.genre as HorrorGenre,
+      description: newMovie.description,
+      poster_url: newMovie.poster_url
+    });
   };
 
   if (isLoading) {
