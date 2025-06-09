@@ -22,7 +22,7 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { error } = await signIn(email, password);
+        const { data, error } = await signIn(email, password);
         
         if (error) {
           toast({
@@ -30,15 +30,14 @@ const Auth = () => {
             description: error.message,
             variant: "destructive",
           });
-        } else {
+        } else if (data?.user) {
           toast({
             title: "¡Bienvenido!",
             description: "Has iniciado sesión correctamente",
           });
-          // Forzar navegación al dashboard
-          setTimeout(() => {
-            navigate("/dashboard", { replace: true });
-          }, 100);
+          
+          // Redirección inmediata al dashboard
+          window.location.href = "/dashboard";
         }
       } else {
         const { error } = await signUp(email, password, username);

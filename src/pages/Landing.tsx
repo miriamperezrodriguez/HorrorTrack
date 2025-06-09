@@ -32,30 +32,30 @@ const Landing = () => {
         </div>
       </header>
 
-      {/* Hero Section with Background Carousel */}
-      <section className="relative py-20 text-center overflow-hidden">
+      {/* Hero Section with Background Carousel - Full Screen */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Background Carousel */}
         <div className="absolute inset-0">
-          <div className="h-full w-full opacity-30">
+          <div className="h-full w-full opacity-40">
             <HorrorCarousel />
           </div>
           {/* Dark overlay */}
-          <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
         </div>
         
         {/* Content over carousel */}
-        <div className="container mx-auto px-4 relative z-10">
-          <h2 className="text-5xl font-bold mb-6 text-red-600 horror-title">
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-8 text-red-600 horror-title">
             Bienvenidos a HorrorTrack
           </h2>
-          <p className="text-xl mb-8 text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl mb-12 text-gray-300 max-w-3xl mx-auto">
             Lleva un registro de todas las películas de terror que has visto, 
             califica tus favoritas y descubre nuevos títulos que te harán temblar.
           </p>
           <Button 
             size="lg" 
             onClick={() => navigate("/auth")}
-            className="bg-red-600 hover:bg-red-700 text-lg px-8 py-3"
+            className="bg-red-600 hover:bg-red-700 text-xl px-12 py-4"
           >
             Comenzar Ahora
           </Button>
