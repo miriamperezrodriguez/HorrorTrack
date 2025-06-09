@@ -1,11 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { signIn, signUp } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +16,15 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, loading: authLoading } = useAuth();
+
+  // Redirigir cuando el usuario esté autenticado
+  useEffect(() => {
+    if (user && !authLoading) {
+      console.log("Usuario autenticado detectado, redirigiendo al dashboard");
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,10 +47,7 @@ const Auth = () => {
           });
           
           console.log("Usuario logueado:", data.user);
-          console.log("Redirigiendo al dashboard...");
-          
-          // Usar navigate en lugar de window.location.href
-          navigate("/dashboard", { replace: true });
+          // No redirigimos aquí, el useEffect se encargará cuando el estado se actualice
         }
       } else {
         const { error } = await signUp(email, password, username);
@@ -82,17 +89,6 @@ const Auth = () => {
             <p className="text-gray-400">
               {isLogin ? "Inicia sesión en tu cuenta" : "Crea tu cuenta"}
             </p>
-            <div className="mt-4 p-3 bg-gray-700 rounded-lg">
-              <p className="text-sm text-gray-300 mb-2">
-                <strong>Credenciales de SuperAdmin:</strong>
-              </p>
-              <p className="text-xs text-gray-400">
-                Email: miriamisonfireart@gmail.com
-              </p>
-              <p className="text-xs text-gray-400">
-                Password: 130896
-              </p>
-            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
