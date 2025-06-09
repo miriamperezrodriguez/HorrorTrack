@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { useMovies } from "@/hooks/useMovies";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Database } from '@/integrations/supabase/types';
 
 type HorrorGenre = Database['public']['Enums']['horror_genre'];
@@ -40,22 +40,57 @@ export const MovieManagement = () => {
   const { data: movies = [], isLoading } = useMovies();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const addMovie = useMutation({
     mutationFn: async (movieData: typeof newMovie) => {
-      const { data, error } = await supabase
-        .from('movies')
-        .insert([{
-          title: movieData.title,
-          year: movieData.year,
-          genre: movieData.genre as HorrorGenre,
-          description: movieData.description,
-          poster_url: movieData.poster_url
-        }])
-        .select();
+      console.log("Agregando película:", movieData);
+      console.log("Usuario actual:", user);
+      
+      // Para el superadmin local, usar RPC o insertar directamente sin RLS
+      if (user?.email === 'admin@horrortrack.com') {
+        const { data, error } = await supabase.rpc('insert_movie_as_admin', {
+          movie_title: movieData.title,
+          movie_year: movieData.year,
+          movie_genre: movieData.genre as HorrorGenre,
+          movie_description: movieData.description,
+          movie_poster_url: movieData.poster_url
+        });
 
-      if (error) throw error;
-      return data;
+        if (error) {
+          console.log("Error con RPC, intentando inserción directa:", error);
+          // Fallback: inserción directa
+          const { data: directData, error: directError } = await supabase
+            .from('movies')
+            .insert([{
+              title: movieData.title,
+              year: movieData.year,
+              genre: movieData.genre as HorrorGenre,
+              description: movieData.description,
+              poster_url: movieData.poster_url
+            }])
+            .select();
+
+          if (directError) throw directError;
+          return directData;
+        }
+        return data;
+      } else {
+        // Para usuarios normales
+        const { data, error } = await supabase
+          .from('movies')
+          .insert([{
+            title: movieData.title,
+            year: movieData.year,
+            genre: movieData.genre as HorrorGenre,
+            description: movieData.description,
+            poster_url: movieData.poster_url
+          }])
+          .select();
+
+        if (error) throw error;
+        return data;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['movies'] });
@@ -72,10 +107,11 @@ export const MovieManagement = () => {
       });
       setShowAddForm(false);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Error agregando película:", error);
       toast({
         title: "Error",
-        description: "No se pudo agregar la película",
+        description: `No se pudo agregar la película: ${error.message}`,
         variant: "destructive"
       });
     }
