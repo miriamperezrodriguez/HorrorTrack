@@ -1,6 +1,4 @@
 
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useEffect, useState } from "react";
 
 const horrorImages = [

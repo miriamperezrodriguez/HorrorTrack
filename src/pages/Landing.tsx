@@ -12,7 +12,7 @@ const Landing = () => {
       <header className="bg-gray-900 shadow-lg">
         <div className="container mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold text-red-600">HorrorTrack</h1>
+            <h1 className="text-3xl font-bold text-red-600 horror-title">HorrorTrack</h1>
             <div className="space-x-4">
               <Button 
                 variant="outline" 
@@ -35,8 +35,8 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="py-20 text-center">
         <div className="container mx-auto px-4">
-          <h2 className="text-5xl font-bold mb-6 text-red-600">
-            Seguimiento de Películas de Terror
+          <h2 className="text-5xl font-bold mb-6 text-red-600 horror-title">
+            Bienvenidos a HorrorTrack
           </h2>
           <p className="text-xl mb-8 text-gray-300 max-w-2xl mx-auto">
             Lleva un registro de todas las películas de terror que has visto, 
@@ -55,7 +55,7 @@ const Landing = () => {
       {/* Features Section */}
       <section className="py-16 bg-gray-900">
         <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold text-center mb-12 text-red-600">
+          <h3 className="text-3xl font-bold text-center mb-12 text-red-600 horror-title">
             Características
           </h3>
           <div className="grid md:grid-cols-3 gap-8">
@@ -93,17 +93,19 @@ const Landing = () => {
       {/* Horror Movies Carousel */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold text-center mb-12 text-red-600">
+          <h3 className="text-3xl font-bold text-center mb-12 text-red-600 horror-title">
             Películas Destacadas
           </h3>
-          <HorrorCarousel />
+          <div className="h-96">
+            <HorrorCarousel />
+          </div>
         </div>
       </section>
 
       {/* CTA Section */}
       <section className="py-16 bg-gray-900">
         <div className="container mx-auto px-4 text-center">
-          <h3 className="text-3xl font-bold mb-6 text-red-600">
+          <h3 className="text-3xl font-bold mb-6 text-red-600 horror-title">
             ¿Listo para el Terror?
           </h3>
           <p className="text-xl mb-8 text-gray-300">

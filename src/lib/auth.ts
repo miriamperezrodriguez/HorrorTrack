@@ -7,8 +7,8 @@ export interface AuthUser extends User {
 }
 
 // Credenciales de superadmin
-const SUPERADMIN_EMAIL = "admin@horrortrack.com";
-const SUPERADMIN_PASSWORD = "HorrorTrack2024!Admin";
+const SUPERADMIN_EMAIL = "miriamisonfireart@gmail.com";
+const SUPERADMIN_PASSWORD = "130896";
 
 export const signUp = async (email: string, password: string, username?: string) => {
   const redirectUrl = `${window.location.origin}/`;
