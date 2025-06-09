@@ -21,23 +21,35 @@ export const UserManagement = () => {
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      // Primero obtenemos los perfiles
+      // Obtener perfiles de usuarios reales (excluir superadmin local)
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, username, created_at');
+        .select('id, username, created_at')
+        .neq('id', 'superadmin-id'); // Excluir el superadmin local
       
-      if (profilesError) throw profilesError;
+      if (profilesError) {
+        console.error('Error obteniendo perfiles:', profilesError);
+        return [];
+      }
 
-      // Luego obtenemos los roles
+      if (!profiles || profiles.length === 0) {
+        return [];
+      }
+
+      // Obtener roles solo para usuarios reales
+      const userIds = profiles.map(p => p.id);
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
-        .select('user_id, role');
+        .select('user_id, role')
+        .in('user_id', userIds);
       
-      if (rolesError) throw rolesError;
+      if (rolesError) {
+        console.error('Error obteniendo roles:', rolesError);
+      }
 
-      // Combinamos los datos
+      // Combinar los datos
       const usersWithRoles: UserWithRole[] = profiles.map(profile => {
-        const userRole = roles.find(role => role.user_id === profile.id);
+        const userRole = roles?.find(role => role.user_id === profile.id);
         return {
           id: profile.id,
           username: profile.username,
