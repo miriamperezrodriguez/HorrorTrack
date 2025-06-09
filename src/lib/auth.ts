@@ -6,6 +6,10 @@ export interface AuthUser extends User {
   session?: Session;
 }
 
+// Credenciales de superadmin
+const SUPERADMIN_EMAIL = "superadmin@horrortrack.com";
+const SUPERADMIN_PASSWORD = "HorrorTrack2024!Admin";
+
 export const signUp = async (email: string, password: string, username?: string) => {
   const redirectUrl = `${window.location.origin}/`;
   
@@ -24,6 +28,57 @@ export const signUp = async (email: string, password: string, username?: string)
 };
 
 export const signIn = async (email: string, password: string) => {
+  // Verificar si son credenciales de superadmin
+  if (email === SUPERADMIN_EMAIL && password === SUPERADMIN_PASSWORD) {
+    // Intentar iniciar sesión con superadmin
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    
+    if (error) {
+      // Si el superadmin no existe, crearlo
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: SUPERADMIN_EMAIL,
+        password: SUPERADMIN_PASSWORD,
+        options: {
+          data: {
+            username: 'SuperAdmin'
+          }
+        }
+      });
+      
+      if (signUpError) {
+        return { data: null, error: signUpError };
+      }
+      
+      // Asignar rol de superadmin
+      if (signUpData.user) {
+        await supabase
+          .from('user_roles')
+          .upsert({
+            user_id: signUpData.user.id,
+            role: 'superadmin'
+          });
+      }
+      
+      return { data: signUpData, error: null };
+    }
+    
+    // Asegurar que tiene rol de superadmin
+    if (data.user) {
+      await supabase
+        .from('user_roles')
+        .upsert({
+          user_id: data.user.id,
+          role: 'superadmin'
+        });
+    }
+    
+    return { data, error };
+  }
+  
+  // Inicio de sesión normal
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password

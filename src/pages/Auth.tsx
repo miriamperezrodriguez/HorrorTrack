@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,12 +65,12 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-gray-800 rounded-lg shadow-xl p-8">
           <div className="text-center mb-8">
             <h1 
-              className="text-4xl font-bold text-red-600 mb-2"
+              className="text-4xl font-bold text-red-600 mb-2 horror-title"
               style={{ fontFamily: 'Another Danger, serif' }}
             >
               HORRORTRACK
@@ -79,6 +78,17 @@ const Auth = () => {
             <p className="text-gray-400">
               {isLogin ? "Inicia sesión en tu cuenta" : "Crea tu cuenta"}
             </p>
+            <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+              <p className="text-sm text-gray-300 mb-2">
+                <strong>Credenciales de SuperAdmin:</strong>
+              </p>
+              <p className="text-xs text-gray-400">
+                Email: superadmin@horrortrack.com
+              </p>
+              <p className="text-xs text-gray-400">
+                Password: HorrorTrack2024!Admin
+              </p>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
