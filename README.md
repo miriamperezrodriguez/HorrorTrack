@@ -1,73 +1,48 @@
-# Welcome to your Lovable project
+# 🚀 TFG: HorrorTrack: Plataforma de Registro y Reseñas de Películas de Terror
 
-## Project info
+# 📖 Resumen
 
-**URL**: https://lovable.dev/projects/e30ca5ba-272c-4be6-9e2b-12ccdd47ca78
+HorrorTrack es una plataforma web diseñada para los amantes del cine de terror, permitiéndoles llevar un registro de las películas que han visto, calificarlas y escribir reseñas. Además, los usuarios podrán descubrir nuevas películas según su género favorito y compartir sus opiniones con amigos dentro de la comunidad.
 
-## How can I edit this code?
 
-There are several ways of editing your application.
+# 💡 Objetivo del Proyecto
+El objetivo principal es ofrecer un espacio donde los aficionados del cine de terror puedan organizar su historial cinematográfico, recibir recomendaciones personalizadas y conectarse con otros usuarios que comparten su pasión.
 
-**Use Lovable**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/e30ca5ba-272c-4be6-9e2b-12ccdd47ca78) and start prompting.
+# 🎬 Funciones principales
 
-Changes made via Lovable will be committed automatically to this repo.
+ ✔️ Registro e inicio de sesión de usuarios.
+ 
+ ✔️ Añadir películas a listas personalizadas (vistas, pendientes, favoritas).
+ 
+ ✔️ Sistema de puntuación y reseñas.
+ 
+ ✔️ Filtrado por género y ordenación por puntuación.
+ 
+ ✔️ Interacción social: posibilidad de añadir amigos y ver sus reseñas.***
+ 
+ ✔️ Plataformas donde estén disponibles las películas.***
 
-**Use your preferred IDE**
+ 
+# 🛠️ Tecnologías utilizadas
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+ 🎨 Frontend: React.js + Tailwind CSS para un diseño moderno y responsivo.
+ 
+ ⚙️ Backend: Python con Django/Flask para gestionar la lógica y API REST.
+ 
+ 💾 Base de Datos: PostgreSQL o MongoDB para almacenar películas, usuarios y reseñas.
+ 
+ 🔗 Integraciones: API externa (OMDb o TMDb) para obtener información actualizada de películas.***
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+ 
+# 🎯 Impacto y Beneficio
 
-Follow these steps:
+ 🔹 Centraliza la gestión de películas de terror en un solo lugar.
+ 
+ 🔹 Facilita la búsqueda y organización del contenido según preferencias personales.
+ 
+ 🔹 Fomenta la comunidad de cinéfilos mediante reseñas y puntuaciones.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# ***: 
+Estos apartados están aún por confirmar.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/e30ca5ba-272c-4be6-9e2b-12ccdd47ca78) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
